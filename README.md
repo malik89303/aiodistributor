@@ -1,1 +1,2 @@
-# Python library for synchronization of replicated asynchronous services
+# Python asynchronous library for synchronizing replicated microservices
+
