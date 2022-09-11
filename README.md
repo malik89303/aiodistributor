@@ -1,2 +1,1 @@
-# aiodistributor
-Python library for synchronization of replicated asynchronous services
+# Python library for synchronization of replicated asynchronous services
