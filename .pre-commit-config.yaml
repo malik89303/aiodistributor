@@ -1,0 +1,59 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 'v4.3.0'
+    hooks:
+      - id: check-merge-conflict
+        stages:
+          - push
+      - id: check-case-conflict
+        stages:
+          - commit
+          - push
+      - id: check-yaml
+        stages:
+          - commit
+          - push
+      - id: double-quote-string-fixer
+        stages:
+          - commit
+          - push
+      - id: end-of-file-fixer
+        stages:
+          - commit
+          - push
+      - id: mixed-line-ending
+        args: [ "--fix=no" ]
+        stages:
+          - commit
+          - push
+      - id: name-tests-test
+        stages:
+          - commit
+          - push
+        args: [ "--pytest-test-first" ]
+      - id: requirements-txt-fixer
+        stages:
+          - commit
+          - push
+      - id: trailing-whitespace
+        stages:
+          - commit
+          - push
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.4.0
+    hooks:
+      - id: yesqa
+  - repo: https://github.com/pycqa/isort
+    rev: '5.10.1'
+    hooks:
+      - id: isort
+        args: [ "--profile", "black" ]
+  - repo: https://github.com/psf/black
+    rev: '22.8.0'
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/PyCQA/flake8
+    rev: '5.0.4'
+    hooks:
+      - id: flake8
