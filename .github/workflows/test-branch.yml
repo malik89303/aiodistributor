@@ -48,4 +48,4 @@ jobs:
         run:
           docker run
           ${{ github.event.repository.name }}:0.0
-          mypy --config-file mypy.ini -p src
+          mypy --config-file mypy.ini -p aiodistributor
