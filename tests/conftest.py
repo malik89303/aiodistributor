@@ -3,7 +3,7 @@ from os import getenv
 import pytest
 from redis.asyncio.client import Redis
 
-from aiodistributor.distributed_futures import RedisCondition
+from aiodistributor.distributed_waiter import DistributedWaiter
 
 REDIS_HOST = getenv('REDIS_HOST', '127.0.0.1')
 REDIS_PORT = int(getenv('REDIS_PORT', 6379))
@@ -26,8 +26,8 @@ async def isolate_redis(event_loop) -> Redis:
 
 
 @pytest.fixture()
-async def isolate_redis_condition(isolate_redis, event_loop) -> Redis:
-    condition = RedisCondition(isolate_redis, loop=event_loop)
-    await condition.start()
-    yield condition
-    await condition.stop()
+async def isolate_distributed_waiter(isolate_redis) -> DistributedWaiter:
+    waiter = DistributedWaiter(isolate_redis)
+    await waiter.start()
+    yield waiter
+    await waiter.stop()
