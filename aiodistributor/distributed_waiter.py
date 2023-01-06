@@ -42,7 +42,7 @@ class DistributedWaiter:
 
     async def start(self) -> None:
         if not self._is_stopped:
-            raise ValueError('distributed waiter already started')
+            return
 
         self._logger.info('starting distributed waiter')
         await self._redis.initialize()
@@ -53,7 +53,7 @@ class DistributedWaiter:
 
     async def stop(self) -> None:
         if self._is_stopped:
-            raise ValueError('distributed waiter already stopped')
+            return
 
         if self._healthcheck_task is not None:
             self._healthcheck_task.cancel()
@@ -71,7 +71,7 @@ class DistributedWaiter:
         self._futures = {}
         self._is_stopped = True
 
-    async def restart(self) -> None:
+    async def _restart(self) -> None:
         self._logger.warning('restarting distributed waiter')
         await self.stop()
         await self.start()
@@ -140,7 +140,7 @@ class DistributedWaiter:
                     future.set_result(True)
                 elif message == self._healthcheck_key:
                     self._logger.error('got healthcheck message, but healthcheck future not found')
-                    asyncio.create_task(self.restart())
+                    asyncio.create_task(self._restart())
                     return
                 else:
                     self._logger.error(f'future not found for {message=}')
@@ -159,17 +159,12 @@ class DistributedWaiter:
 
             try:
                 await self._healthcheck()
-                is_alive = True
             except asyncio.CancelledError:
                 self._logger.warning('healthcheck task cancelled')
                 raise
             except BaseException:
                 self._logger.exception('failed to healthcheck')
-                is_alive = False
-
-            if not is_alive:
-                asyncio.create_task(self.restart())
-                return
+                asyncio.create_task(self._restart())
 
     async def _healthcheck(self) -> None:
         if self._pubsub is None:
