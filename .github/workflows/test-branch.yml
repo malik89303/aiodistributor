@@ -7,16 +7,18 @@ on:
 
 jobs:
   build:
-    services:
-      redis:
-        image: redis:7
-        env:
-          REDIS_PORT: 6379
 
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [ "3.10", "3.11" ]
+
+    services:
+      redis:
+        image: redis:7
+        env:
+          REDIS_PORT: 6379
+          REDIS_HOST: redis
 
     steps:
       - uses: actions/checkout@v3
@@ -38,3 +40,6 @@ jobs:
       - name: pytest
         run: |
           python -m pytest;
+        env:
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
