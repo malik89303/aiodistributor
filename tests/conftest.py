@@ -3,6 +3,7 @@ from os import getenv
 import pytest
 from redis.asyncio.client import Redis
 
+from aiodistributor.distributed_notifier import DistributedNotifier
 from aiodistributor.distributed_waiter import DistributedWaiter
 
 REDIS_HOST = getenv('REDIS_HOST', '127.0.0.1')
@@ -18,6 +19,7 @@ async def isolate_redis(event_loop) -> Redis:
         username=REDIS_USER,
         password=REDIS_PASSWORD,
         port=REDIS_PORT,
+        decode_responses=True,
     )
     await redis.initialize()
     yield redis
@@ -31,3 +33,11 @@ async def isolate_distributed_waiter(isolate_redis) -> DistributedWaiter:
     await waiter.start()
     yield waiter
     await waiter.stop()
+
+
+@pytest.fixture()
+async def isolate_distributed_notifier(isolate_redis) -> DistributedNotifier:
+    waiter = DistributedNotifier(isolate_redis)
+    # TODO
+    yield waiter
+    # TODO
