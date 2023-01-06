@@ -19,6 +19,11 @@ jobs:
         env:
           REDIS_PORT: 6379
           REDIS_HOST: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
