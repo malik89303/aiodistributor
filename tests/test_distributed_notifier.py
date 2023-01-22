@@ -1,6 +1,8 @@
 import asyncio
 from datetime import datetime, timedelta
 
+import pytest
+
 from aiodistributor.distributed_notifier import DistributedNotifier
 
 STREAM_ID = 'aboba'
@@ -35,7 +37,7 @@ async def test_add_message_to_stream(isolate_distributed_notifier: DistributedNo
 async def test_get_message_from_stream_empty(isolate_distributed_notifier: DistributedNotifier):
     res = await isolate_distributed_notifier.wait_message_from_stream(
         stream_id=STREAM_ID,
-        after_message_id='0',
+        last_message_id='0',
         block_timeout=None,
     )
     assert res == (None, None)
@@ -46,7 +48,7 @@ async def test_get_message_from_stream_single_not_blocking(isolate_distributed_n
 
     selected_message_id, selected_message = await isolate_distributed_notifier.wait_message_from_stream(
         stream_id=STREAM_ID,
-        after_message_id='0',
+        last_message_id='0',
         block_timeout=None,
     )
     assert selected_message_id == message_id
@@ -57,7 +59,7 @@ async def test_get_message_from_stream_single_blocking(isolate_distributed_notif
     task = asyncio.create_task(
         isolate_distributed_notifier.wait_message_from_stream(
             stream_id=STREAM_ID,
-            after_message_id='0',
+            last_message_id='0',
             block_timeout=1,
         )
     )
@@ -79,7 +81,7 @@ async def test_get_message_from_stream_multiple(isolate_distributed_notifier: Di
 
     selected_message_id, selected_message = await isolate_distributed_notifier.wait_message_from_stream(
         stream_id=STREAM_ID,
-        after_message_id='0',
+        last_message_id='0',
         block_timeout=None,
     )
     assert selected_message_id == first_message_id
@@ -87,7 +89,7 @@ async def test_get_message_from_stream_multiple(isolate_distributed_notifier: Di
 
     selected_message_id, selected_message = await isolate_distributed_notifier.wait_message_from_stream(
         stream_id=STREAM_ID,
-        after_message_id=first_message_id,
+        last_message_id=first_message_id,
         block_timeout=None,
     )
     assert selected_message_id == second_message_id
@@ -145,3 +147,60 @@ async def test_add_message_to_stream_lower_timestamp(isolate_distributed_notifie
         timestamp=now - timedelta(minutes=10),
     )
     assert res is None
+
+
+async def test_get_message_empty(isolate_distributed_notifier: DistributedNotifier):
+    messages = []
+
+    async def background_consumer():
+        async for message in isolate_distributed_notifier.get_message(stream_id='aboba'):
+            messages.append(message)
+
+    task = asyncio.create_task(background_consumer())
+
+    for i in range(20):
+        await isolate_distributed_notifier.add_message_to_stream_if_newer(
+            stream_id='aboba',
+            message=str(i),
+            timestamp=None,
+        )
+    await asyncio.sleep(0.01)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert messages == list(map(str, range(20)))
+
+
+async def test_get_message_filled(isolate_distributed_notifier: DistributedNotifier):
+    messages = []
+
+    async def background_consumer():
+        async for message in isolate_distributed_notifier.get_message(stream_id='aboba'):
+            messages.append(message)
+
+    for i in range(5):
+        await isolate_distributed_notifier.add_message_to_stream_if_newer(
+            stream_id='aboba',
+            message=str(i),
+            timestamp=None,
+            max_len=None,
+        )
+
+    task = asyncio.create_task(background_consumer())
+    await asyncio.sleep(0.01)
+
+    for i in range(5, 7):
+        await isolate_distributed_notifier.add_message_to_stream_if_newer(
+            stream_id='aboba',
+            message=str(i),
+            timestamp=None,
+            max_len=None,
+        )
+
+    await asyncio.sleep(0.01)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert messages == ['4', '5', '6']

@@ -11,7 +11,7 @@ from redis.utils import str_if_bytes
 from aiodistributor.common.loggers import distributed_waiter_logger
 
 
-class DistributedWaiter:
+class DistributedWaiter:  # TODO докстринги
     def __init__(
         self,
         redis: 'Redis[Any]',

@@ -36,7 +36,7 @@ async def test_reset(isolate_redis, inserted_count):
     assert await counter.count() == inserted_count
 
     res = await counter.reset()
-    assert res is None
+    assert res == 0
 
     assert await counter.count() == 0
 
