@@ -18,7 +18,7 @@ async def test_distributed_task(isolate_redis):
     mutable_list = []
     task = DistributedTask(
         name='test_interval_task',
-        task_period=0.05,
+        task_period=0.1,
         locker_timeout=0.1,
         task_func=task_for_test,
         redis=isolate_redis,
@@ -26,7 +26,7 @@ async def test_distributed_task(isolate_redis):
     )
 
     await task.start()
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.15)
     await task.stop(0.)
 
     assert len(mutable_list) == 2
