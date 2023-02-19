@@ -1,1 +1,6 @@
 /venv/
+/.idea/
+/htmlcov/
+/.coverage
+/.mypy_cache/
+/.pytest_cache/
