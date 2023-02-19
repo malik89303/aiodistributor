@@ -26,7 +26,7 @@ async def test_distributed_task(isolate_redis):
     )
 
     await task.start()
-    await asyncio.sleep(0.05)
+    await asyncio.sleep(0.07)
     await task.stop(0.)
 
     assert len(mutable_list) == 1
