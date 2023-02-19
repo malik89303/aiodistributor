@@ -122,3 +122,17 @@ async def test_run_consumer_unknown_healthcheck_message(isolate_distributed_wait
 
     await asyncio.sleep(0.1)
     mocked_restart.assert_called_once()
+
+
+async def test_start_stop(isolate_distributed_waiter):
+    await isolate_distributed_waiter.start()
+    assert not isolate_distributed_waiter._is_stopped
+
+    await isolate_distributed_waiter.stop()
+    assert isolate_distributed_waiter._is_stopped
+
+
+async def test_notify_with_failed_publish(isolate_distributed_waiter, mocker):
+    mocker.patch.object(isolate_distributed_waiter._redis, 'publish', return_value=0)
+    res = await isolate_distributed_waiter.notify(ID)
+    assert res is False

@@ -5,6 +5,11 @@ from redis.asyncio import Redis
 
 
 class DistributedSlidingCounter:
+    """
+    This class is a Python implementation of a distributed sliding counter that utilizes Redis for storage.
+    The sliding counter counts events that occur within a specific time window and can be used to implement
+     rate limiting or throttle mechanisms.
+    """
 
     def __init__(
         self,

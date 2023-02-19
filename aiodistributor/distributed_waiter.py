@@ -12,6 +12,22 @@ from aiodistributor.common.loggers import distributed_waiter_logger
 
 
 class DistributedWaiter:  # TODO докстринги
+    """
+    DistributedWaiter class is an asyncio-based implementation of a distributed waiter,
+    which waits for signals from other nodes or services and triggers the appropriate callback.
+
+    The class uses Redis to implement a publish-subscribe model for communication between nodes.
+    It can subscribe to a Redis channel and receive messages, and it can also publish messages to a channel.
+
+    The waiter can create a wait for a specified key and wait for a signal to be received before continuing.
+    The wait can also have a timeout, after which the waiter will resume execution.
+
+    The class can also be started and stopped.
+     When started, it initializes the Redis connection and starts the poller and healthcheck tasks.
+    When stopped, it cancels the tasks and cleans up any state.
+
+    """
+
     def __init__(
         self,
         redis: 'Redis[Any]',
@@ -22,6 +38,18 @@ class DistributedWaiter:  # TODO докстринги
         default_timeout: int = 30,  # [sec]
         logger: logging.Logger = distributed_waiter_logger,
     ) -> None:
+        """
+        :param redis: The Redis client object used to connect to the Redis server.
+        :param channel_name:The name of the Redis channel that the poller is subscribed to.
+        :param consumer_timeout: The amount of time in seconds that the consumer will wait for a message before
+         timing out.
+        :param healthcheck_period:The amount of time in seconds between healthcheck messages.
+        :param healthcheck_timeout: The amount of time in seconds that the waiter will wait for a healthcheck message
+         before restarting.
+        :param default_timeout: The default amount of time in seconds that a waiter will wait for a signal before
+         timing out.
+        :param logger:The logger object used to log events and errors.
+        """
         self._redis: Redis[Any] = redis
         self._channel_name: str = channel_name or f'waiter_channel:{uuid.uuid4()}'
 
@@ -41,6 +69,9 @@ class DistributedWaiter:  # TODO докстринги
         self._logger = logger
 
     async def start(self) -> None:
+        """
+        Starts the distributed waiter.
+        """
         if not self._is_stopped:
             return
 
@@ -52,6 +83,9 @@ class DistributedWaiter:  # TODO докстринги
         self._is_stopped = False
 
     async def stop(self) -> None:
+        """
+        Stops the distributed waiter.
+        """
         if self._is_stopped:
             return
 
@@ -72,11 +106,20 @@ class DistributedWaiter:  # TODO докстринги
         self._is_stopped = True
 
     async def _restart(self) -> None:
+        """
+        Restarts the distributed waiter.
+        """
         self._logger.warning('restarting distributed waiter')
         await self.stop()
         await self.start()
 
     async def notify(self, key: str) -> bool:
+        """
+        Notifies the waiter that a signal has been received for the specified key.
+
+        :param key:  key for the signal.
+        :return: True if the signal was successfully sent; otherwise, False.
+        """
         if self._is_stopped:
             raise ValueError('cannot notify waiter with stopped consumer')
 
@@ -90,6 +133,16 @@ class DistributedWaiter:  # TODO докстринги
         return True
 
     async def create_waiter(self, key: str, timeout: float | None, expire: int | None) -> Coroutine[Any, Any, Any]:
+        """
+        Creates a new waiter for the specified key.
+
+        :param key:The key for the signal.
+        :param timeout:The amount of time in seconds that the waiter will wait for a signal before timing out.
+         Defaults to None.
+        :param expire: The amount of time in seconds before the waiter's key expires. Defaults to None.
+
+        :return: The coroutine for waiting for the signal.
+        """
         if self._is_stopped:
             raise ValueError('cannot create waiter with stopped consumer')
 
@@ -102,6 +155,14 @@ class DistributedWaiter:  # TODO докстринги
         return self._wait(self._futures[key], timeout)
 
     async def _wait(self, future: Future[Any], timeout: float | None) -> bool:
+        """
+        Waits for the specified future to complete.
+        :param future: The future to wait for.
+        :param timeout: The amount of time in seconds that the waiter will wait for the future before timing out.
+         Defaults to None.
+
+        :return:True if signal received successfully; otherwise, False.
+        """
         try:
             return await asyncio.wait_for(
                 fut=future,
@@ -111,10 +172,16 @@ class DistributedWaiter:  # TODO докстринги
             del future
 
     async def _init_pubsub(self) -> None:
+        """
+        Initializes the Redis pubsub object.
+        """
         self._pubsub = self._redis.pubsub(ignore_subscribe_messages=True)
         await self._pubsub.subscribe(self._channel_name)
 
     async def _run_consumer(self) -> None:
+        """
+        Runs the consumer task that listens for messages from Redis.
+        """
         if self._pubsub is None:
             raise ValueError('redis pubsub is not initialized')
 
@@ -153,6 +220,9 @@ class DistributedWaiter:  # TODO докстринги
                 await asyncio.sleep(self._healthcheck_period)
 
     async def _run_healthcheck(self) -> None:
+        """
+        Runs the healthcheck task that periodically sends healthcheck messages to Redis.
+        """
         while True:
             await asyncio.sleep(self._healthcheck_period)
             self._logger.debug('starting healthcheck')
@@ -167,6 +237,9 @@ class DistributedWaiter:  # TODO докстринги
                 asyncio.create_task(self._restart())
 
     async def _healthcheck(self) -> None:
+        """
+        Sends a healthcheck message to Redis.
+        """
         if self._pubsub is None:
             raise ValueError('redis pubsub is not initialized')
         elif self._pubsub.connection is None:
