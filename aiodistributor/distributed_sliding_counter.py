@@ -6,17 +6,6 @@ from redis.asyncio import Redis
 
 class DistributedSlidingCounter:
 
-    LUA_SCRIPT = """
-        local key = ARGV[1]
-        local current_time = tonumber(ARGV[2])
-        local expire_ms = tonumber(ARGV[3])
-        redis.call('ZREMRANGEBYSCORE', key, '-inf', current_time - expire_ms / 1000)
-        redis.call('ZADD', key, current_time, current_time)
-        local amount = redis.call('ZCARD', key)
-        redis.call('PEXPIRE', key, expire_ms)
-        return amount
-    """
-
     def __init__(
         self,
         redis: 'Redis[Any]',
@@ -26,20 +15,32 @@ class DistributedSlidingCounter:
         self.redis: Redis[Any] = redis
         self._key: str = key
         self._lifetime: int = lifetime
-        self._increaser_and_count_script = self.redis.register_script(self.LUA_SCRIPT)
 
     async def increase(self) -> int:
-        return await self._increaser_and_count_script(
-            args=[
-                self._key,
-                str(datetime.utcnow().timestamp()),
-                str(self._lifetime),
-            ],
-            client=self.redis
-        )
+        """
+        increases sliding counter
+        :return: current counter value
+        """
+        now = datetime.utcnow().timestamp()
+        pipe = self.redis.pipeline()
+        pipe.zremrangebyscore(self._key, '-inf', now - self._lifetime / 1000)
+        pipe.zadd(self._key, {now: now})  # type: ignore
+        pipe.zcard(self._key)
+        pipe.pexpire(self._key, self._lifetime)
+        _, _, count, _ = await pipe.execute()
 
-    async def reset(self) -> None:
+        return count
+
+    async def reset(self) -> int:
+        """
+        resets counter to zero
+        :return: current counter value
+        """
         await self.redis.zremrangebyscore(self._key, '-inf', '+inf')
+        return await self.count()
 
     async def count(self) -> int:
+        """
+        :return: returns current counter value
+        """
         return await self.redis.zcard(self._key)
