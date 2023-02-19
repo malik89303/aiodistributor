@@ -204,3 +204,39 @@ async def test_get_message_filled(isolate_distributed_notifier: DistributedNotif
         await task
 
     assert messages == ['4', '5', '6']
+
+
+async def test_get_last_stream_message_id_empty(isolate_distributed_notifier: DistributedNotifier):
+    res = await isolate_distributed_notifier.get_last_stream_message(STREAM_ID)
+    assert res == (None, None)
+
+
+async def test_wait_message_from_stream_timeout(isolate_distributed_notifier: DistributedNotifier):
+    res = await isolate_distributed_notifier.wait_message_from_stream(
+        stream_id=STREAM_ID,
+        last_message_id='0',
+        block_timeout=1,
+    )
+    assert res == (None, None)
+
+
+async def test_add_message_to_stream_outdated(isolate_distributed_notifier: DistributedNotifier):
+    now = datetime.utcnow()
+    await isolate_distributed_notifier.add_message_to_stream_if_newer(
+        stream_id=STREAM_ID,
+        message='old message',
+        timestamp=now - timedelta(minutes=10),
+        max_len=None,
+    )
+
+    message_id = await isolate_distributed_notifier.add_message_to_stream_if_newer(
+        stream_id=STREAM_ID,
+        message='new message',
+        timestamp=now,
+        max_len=None,
+    )
+    assert message_id is not None
+
+    res = await isolate_distributed_notifier.get_last_stream_message(STREAM_ID)
+    assert res[0] == message_id
+    assert res[1] == 'new message'

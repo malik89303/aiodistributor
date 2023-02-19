@@ -29,6 +29,43 @@ async def test_count(isolate_redis, values, expected_count):
     assert await counter.count() == 0
 
 
+async def test_count_expired(isolate_redis):
+    counter = DistributedSlidingCounter(isolate_redis, 'aboba', 200)
+    res = await asyncio.gather(*[counter.increase() for _ in range(10)])
+
+    assert await counter.count() == 10
+    assert set(res) == set(range(1, 11))
+
+    await asyncio.sleep(0.3)
+    assert await counter.count() == 0
+
+    res = await asyncio.gather(*[counter.increase() for _ in range(10)])
+    assert await counter.count() == 10
+    assert set(res) == set(range(1, 11))
+
+
+async def test_expire_counter(isolate_redis):
+    counter = DistributedSlidingCounter(isolate_redis, 'aboba', 100)
+    await counter.increase()
+    await asyncio.sleep(0.15)
+    assert await counter.count() == 0
+
+
+async def test_increase_multiple_times(isolate_redis):
+    counter = DistributedSlidingCounter(isolate_redis, 'aboba', 1000)
+    await counter.increase()
+    await counter.increase()
+    assert await counter.count() == 2
+    await asyncio.sleep(1.1)
+    assert await counter.count() == 0
+
+
+async def test_reset_when_no_events(isolate_redis):
+    counter = DistributedSlidingCounter(isolate_redis, 'aboba', 1000)
+    await counter.reset()
+    assert await counter.count() == 0
+
+
 @pytest.mark.parametrize('inserted_count', list(range(10)))
 async def test_reset(isolate_redis, inserted_count):
     counter = DistributedSlidingCounter(isolate_redis, 'aboba', 10 ** 10)

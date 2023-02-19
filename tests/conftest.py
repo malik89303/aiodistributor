@@ -38,6 +38,5 @@ async def isolate_distributed_waiter(isolate_redis) -> DistributedWaiter:
 @pytest.fixture()
 async def isolate_distributed_notifier(isolate_redis) -> DistributedNotifier:
     waiter = DistributedNotifier(isolate_redis)
-    # TODO
+
     yield waiter
-    # TODO
