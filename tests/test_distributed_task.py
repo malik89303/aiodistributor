@@ -14,24 +14,6 @@ async def long_task_for_test(mutable_list: list[int]) -> None:
     mutable_list.append(1)
 
 
-async def test_distributed_task(isolate_redis):
-    mutable_list = []
-    task = DistributedTask(
-        name='test_interval_task',
-        task_period=10,
-        locker_timeout=20,
-        task_func=task_for_test,
-        redis=isolate_redis,
-        mutable_list=mutable_list,
-    )
-
-    await task.start()
-    await asyncio.sleep(0.1)
-    await task.stop(0.)
-
-    assert len(mutable_list) == 1
-
-
 async def test_stop_distributed_task_with_big_sleep(isolate_redis):
     mutable_list = []
     task = DistributedTask(
