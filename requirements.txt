@@ -6,7 +6,7 @@ pytest==7.2.1
 pytest-asyncio==0.20.3
 pytest-cov==4.0.0
 pytest-mock==3.10.0
-redis==4.3.4
+redis==4.5.3
 types-redis==4.3.21.3
 types-ujson==5.7.0.0
 ujson==5.7.0
