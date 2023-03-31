@@ -11,7 +11,7 @@ from redis.utils import str_if_bytes
 from aiodistributor.common.loggers import distributed_waiter_logger
 
 
-class DistributedWaiter:  # TODO докстринги
+class DistributedWaiter:
     """
     DistributedWaiter class is an asyncio-based implementation of a distributed waiter,
     which waits for signals from other nodes or services and triggers the appropriate callback.
