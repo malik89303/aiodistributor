@@ -4,3 +4,6 @@
 /.coverage
 /.mypy_cache/
 /.pytest_cache/
+/dist/
+/build/
+/aiodistributor.egg-info/
