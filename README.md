@@ -1,6 +1,6 @@
 # [aiodistributor](aiodistributor)
 
-## Python Asynchronous Library for Synchronization of Replicated Microservices	да
+## Python Asynchronous Library for Synchronization of Replicated Microservices
 
 [![codecov](https://codecov.io/gh/malik89303/aiodistributor/branch/dev/graph/badge.svg?token=1QNFR6LTT0)](https://codecov.io/gh/malik89303/aiodistributor)
 ![tests](https://github.com/malik89303/aiodistributor/actions/workflows/test-branch.yml/badge.svg?branch=dev)
