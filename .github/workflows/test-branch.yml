@@ -1,4 +1,4 @@
-name: Run tests in Docker
+name: Test and Linters
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
           mypy --config-file mypy.ini -p aiodistributor;
       - name: pytest
         run: |
-          python -m pytest --cov=aiodistributor --cov-report=xml;
+          python -m pytest tests --cov=aiodistributor --cov-report=xml;
         env:
           REDIS_HOST: localhost
           REDIS_PORT: 6379

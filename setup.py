@@ -45,7 +45,7 @@ setup(
     platforms=['POSIX'],
     url='https://github.com/malik89303/aiodistributor',
     license='Apache License 2.0',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', 'examples']),
     install_requires=[
         'redis',
         'ujson',

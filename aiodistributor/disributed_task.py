@@ -30,18 +30,18 @@ class DistributedTask:
         """
         Initializes a distributed task.
 
-        :param name:A string representing the name of the task.
-        :param task_func:An async function that should be executed by the task.
-        :param redis:A Redis client instance.
+        :param name: A string representing the name of the task.
+        :param task_func: An async function that should be executed by the task.
+        :param redis: A Redis client instance.
         :param locker_name: A string representing the name of the lock that will be used to
-        synchronize the workers.
-        :param task_period:A float representing the time interval between each task execution.
+            synchronize the workers.
+        :param task_period: A float representing the time interval between each task execution.
         :param locker_timeout: A float representing the maximum amount of time a worker is allowed to
-        hold the lock. If a worker fails to release the lock within the specified timeout,
-        the lock will be automatically released by Redis.
+            hold the lock. If a worker fails to release the lock within the specified timeout,
+            the lock will be automatically released by Redis.
         :param logging_period: A float representing the time interval between each log message.
-        :param logger:A logger instance used for logging.
-        :param kwargs:Any additional arguments that should be passed to the task_func when executed.
+        :param logger: A logger instance used for logging.
+        :param kwargs: Any additional arguments that should be passed to the task_func when executed.
         """
         self._func = task_func
         self._redis = redis
