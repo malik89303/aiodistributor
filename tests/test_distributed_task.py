@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from aiodistributor.disributed_task import DistributedTask
+from aiodistributor.distributed_task import DistributedTask
 
 
 async def task_for_test(mutable_list: list[int]) -> None:

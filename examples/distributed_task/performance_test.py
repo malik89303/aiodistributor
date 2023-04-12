@@ -6,7 +6,7 @@ import time
 import ujson
 from redis.asyncio import Redis
 
-from aiodistributor.disributed_task import DistributedTask
+from aiodistributor.distributed_task import DistributedTask
 
 EXEC_STATS = []
 NODE = random.randint(0, 999)

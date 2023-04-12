@@ -9,7 +9,7 @@ from redis.asyncio import Redis
 from aiodistributor.distributed_sliding_counter import DistributedSlidingCounter
 
 EXEC_STATS = []
-NODE = random.randint(0, 999)
+NODE = random.randint(0, 100)
 
 
 async def measure_performance(max_value: int) -> None:
