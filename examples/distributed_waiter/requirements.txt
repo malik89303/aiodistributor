@@ -1,0 +1,3 @@
+redis==4.5.4
+ujson==5.7.0
+# aiodistirbutor==0.0.1
