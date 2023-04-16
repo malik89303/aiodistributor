@@ -14,8 +14,8 @@ NODE = randint(0, 100)
 
 
 async def simulate_workers(number_of_subscribers: int, number_of_groups: int = 4):
-    redis_client = Redis(host='host.docker.internal')
-    notifier = DistributedNotifier(redis=redis_client)
+    redis_client = Redis(host='host.docker.internal', decode_responses=True)
+    notifier = DistributedNotifier(redis=redis_client, )
 
     async def perform_message_reading(notifier: DistributedNotifier, group_id: int, worker_id: int) -> None:
         async for raw_message in notifier.get_message(stream_id=f'stream_{group_id}'):
@@ -47,7 +47,7 @@ async def simulate_workers(number_of_subscribers: int, number_of_groups: int = 4
 
 
 async def simulate_sender(number_of_messages: int = 10, number_of_groups: int = 4) -> None:
-    redis_client = Redis(host='host.docker.internal')
+    redis_client = Redis(host='localhost', decode_responses=True)
 
     notifier = DistributedNotifier(redis=redis_client)
 
