@@ -1,7 +1,11 @@
 import os.path
 import re
+from pathlib import Path
 
 from setuptools import find_packages, setup
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / 'README.md').read_text()
 
 
 def read(*parts):
@@ -39,7 +43,7 @@ setup(
     name='aiodistributor',
     version=read_version(),
     description='Python asynchronous library for synchronizing replicated microservices',
-    long_description='\n\n'.join((read('README.md'), read('CHANGELOG.md'))),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     classifiers=classifiers,
     platforms=['POSIX'],
