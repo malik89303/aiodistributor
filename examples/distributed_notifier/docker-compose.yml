@@ -4,4 +4,4 @@ services:
   worker:
     build: .
     environment:
-      MAX_VALUE: 60
+      NUMBER_OF_SUBSCRIBERS: 25
