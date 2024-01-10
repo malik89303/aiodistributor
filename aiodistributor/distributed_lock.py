@@ -1,5 +1,6 @@
 import asyncio
 import uuid
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -16,7 +17,7 @@ class DistributedLock:
 
     def __init__(
         self,
-        redis: Redis,
+        redis: 'Redis[Any]',
         key: str,
         acquire_sleep_delay: float = 0.1,
         acquire_timeout: float | None = None,
