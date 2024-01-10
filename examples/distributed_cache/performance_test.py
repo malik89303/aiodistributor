@@ -37,7 +37,7 @@ async def measure_performance(max_val) -> None:
         )
 
     await redis_client.append('stats', ujson.dumps(EXEC_STATS))
-    await redis_client.close()
+    await redis_client.aclose()
 
 
 if __name__ == '__main__':

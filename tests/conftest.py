@@ -13,7 +13,7 @@ REDIS_PASSWORD = getenv('REDIS_PASSWORD', '')
 
 
 @pytest.fixture()
-async def isolate_redis(event_loop) -> Redis:
+async def isolate_redis() -> Redis:
     redis = Redis(
         host=REDIS_HOST,
         username=REDIS_USER,
@@ -24,7 +24,7 @@ async def isolate_redis(event_loop) -> Redis:
     await redis.initialize()
     yield redis
     await redis.flushall()
-    await redis.close()
+    await redis.aclose()
 
 
 @pytest.fixture()

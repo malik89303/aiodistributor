@@ -42,7 +42,7 @@ async def measure_performance(period: float) -> None:
     await asyncio.sleep(period)
     await task.stop(timeout=0.)
     await redis_client.append('stats', ujson.dumps(EXEC_STATS))
-    await redis_client.close()
+    await redis_client.aclose()
 
 
 if __name__ == '__main__':
