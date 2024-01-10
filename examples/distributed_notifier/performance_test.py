@@ -43,7 +43,7 @@ async def simulate_workers(number_of_subscribers: int, number_of_groups: int = 4
     )
 
     await redis_client.append('stats', ujson.dumps(EXEC_STATS))
-    await redis_client.close()
+    await redis_client.aclose()
 
 
 async def simulate_sender(number_of_messages: int = 10, number_of_groups: int = 4) -> None:
@@ -68,7 +68,7 @@ async def simulate_sender(number_of_messages: int = 10, number_of_groups: int = 
             message='STOP'
         )
 
-    await redis_client.close()
+    await redis_client.aclose()
 
 
 if __name__ == '__main__':
