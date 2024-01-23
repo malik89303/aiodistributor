@@ -31,7 +31,7 @@ class DistributedLock:
         :param acquire_timeout: Maximum time in seconds to spend attempting to acquire the lock.
         """
         self._redis = redis
-        self._key = key
+        self._key = f'distributed_lock_{key}'
         self._token = str(uuid.uuid4())
         self._acquire_sleep_delay = acquire_sleep_delay
         self._acquire_timeout = acquire_timeout

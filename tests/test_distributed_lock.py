@@ -10,9 +10,9 @@ async def test_successful_lock_acquisition(isolate_redis):
     acquired = await lock.acquire()
     assert acquired
     assert await lock.locked()
-    assert await isolate_redis.get('test_lock') is not None
+    assert await isolate_redis.get('distributed_lock_test_lock') is not None
     await lock.release()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
 
 
 async def test_failed_lock_acquisition_due_to_timeout(isolate_redis):
@@ -20,40 +20,40 @@ async def test_failed_lock_acquisition_due_to_timeout(isolate_redis):
     lock2 = DistributedLock(isolate_redis, 'test_lock', acquire_timeout=0.1)
 
     await lock1.acquire()
-    assert await isolate_redis.get('test_lock') == lock1._token
+    assert await isolate_redis.get('distributed_lock_test_lock') == lock1._token
     with pytest.raises(asyncio.TimeoutError):
         await lock2.acquire()
 
     await lock1.release()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
 
 
 async def test_lock_release(isolate_redis):
     lock = DistributedLock(isolate_redis, 'test_lock')
     await lock.acquire()
-    assert await isolate_redis.get('test_lock') == lock._token
+    assert await isolate_redis.get('distributed_lock_test_lock') == lock._token
     await lock.release()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
 
 
 async def test_context_manager(isolate_redis):
     async with DistributedLock(isolate_redis, 'test_lock') as lock:
         assert await lock.locked()
-        assert await isolate_redis.get('test_lock') == lock._token
+        assert await isolate_redis.get('distributed_lock_test_lock') == lock._token
     assert not await lock.locked()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
 
 
 async def test_locked_method(isolate_redis):
     lock = DistributedLock(isolate_redis, 'test_lock')
     assert not await lock.locked()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
     await lock.acquire()
     assert await lock.locked()
-    assert await isolate_redis.get('test_lock') == lock._token
+    assert await isolate_redis.get('distributed_lock_test_lock') == lock._token
     await lock.release()
     assert not await lock.locked()
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
 
 
 async def test_multiple_instances(isolate_redis):
@@ -72,7 +72,7 @@ async def test_multiple_instances(isolate_redis):
     )
 
     assert acquired1 != acquired2
-    token = await isolate_redis.get('test_lock')
+    token = await isolate_redis.get('distributed_lock_test_lock')
     if acquired1:
         assert token == lock1._token
         await lock1.release()
@@ -80,4 +80,4 @@ async def test_multiple_instances(isolate_redis):
         assert token == lock2._token
         await lock2.release()
 
-    assert await isolate_redis.get('test_lock') is None
+    assert await isolate_redis.get('distributed_lock_test_lock') is None
