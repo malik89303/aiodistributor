@@ -1,3 +1,7 @@
+from typing import Any
+
+from redis.asyncio import Redis
+
 from aiodistributor.distibuted_semaphore import DistributedSemaphore
 
 
@@ -13,7 +17,14 @@ class DistributedBoundedSemaphore(DistributedSemaphore):
     end
     """
 
-    def __init__(self, redis, key, value, acquire_sleep_delay=0.1, acquire_timeout=None) -> None:
+    def __init__(
+        self,
+        redis: 'Redis[Any]',
+        key: str,
+        value: int,
+        acquire_sleep_delay: float = 0.1,
+        acquire_timeout: float | None = None,
+    ) -> None:
         """
         Initializes a distributed bounded semaphore using Redis.
 

@@ -15,16 +15,16 @@ class DistributedEvent:
         """Return True if and only if the internal flag is true."""
         return await self._redis.get(self._name) == '1'
 
-    async def set(self):
+    async def set(self) -> None:
         """Set the internal flag to true. Notify all coroutines waiting for it."""
         await self._redis.set(self._name, '1')
         await self._redis.publish(self._channel_name, '1')
 
-    async def clear(self):
+    async def clear(self) -> None:
         """Reset the internal flag to false."""
         await self._redis.set(self._name, '0')
 
-    async def wait(self):
+    async def wait(self) -> bool:
         """Block until the internal flag is true."""
         if await self.is_set():
             return True
