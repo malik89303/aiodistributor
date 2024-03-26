@@ -36,7 +36,7 @@ class DistributedCondition:
         self._pubsub = self._redis.pubsub()
         self._decr_script = self._redis.register_script(self.LUA_DECR_SCRIPT)
 
-    async def wait(self):
+    async def wait(self) -> bool:
         await self._pubsub.subscribe(self._channel_name)
         try:
             while True:
@@ -44,17 +44,17 @@ class DistributedCondition:
                 if message and message['data'] == '1':
                     result = await self._decr_script(keys=[self._notify_counter_key], args=[], client=self._redis)
                     if result == 1:
-                        break
+                        return True
         finally:
             await self._pubsub.unsubscribe(self._channel_name)
 
-    async def notify(self, n=1):
+    async def notify(self, n: int = 1) -> None:
         if not await self._lock.locked():
             raise RuntimeError('Cannot notify on a condition without holding the lock')
         await self._redis.incrby(self._notify_counter_key, n)
         await self._redis.publish(self._channel_name, '1')
 
-    async def notify_all(self):
+    async def notify_all(self) -> None:
         if not await self._lock.locked():
             raise RuntimeError('Cannot notify on a condition without holding the lock')
 
