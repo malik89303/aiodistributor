@@ -1,0 +1,38 @@
+version: '3'
+services:
+  server1:
+    build: .
+    environment:
+      - PORT=8081
+    ports:
+      - "8081:8081"
+    command: [ "python", "server.py" ]
+
+  server2:
+    build: .
+    environment:
+      - PORT=8082
+    ports:
+      - "8082:8082"
+    command: [ "python", "server.py" ]
+
+  server3:
+    build: .
+    environment:
+      - PORT=8083
+    ports:
+      - "8083:8083"
+    command: [ "python", "server.py" ]
+
+  monitoring:
+    build: .
+    environment:
+      - PORT=8090
+    ports:
+      - "8090:8090"
+    command: [ "python", "monitoring_server.py" ]
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
