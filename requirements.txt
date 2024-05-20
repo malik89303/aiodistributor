@@ -9,5 +9,5 @@ pytest-mock==3.14.0
 redis==5.0.4
 types-redis==4.6.0.20240425
 types-ujson==5.9.0.0
-ujson==5.9.0
+ujson==5.10.0
 yesqa==1.5.0
