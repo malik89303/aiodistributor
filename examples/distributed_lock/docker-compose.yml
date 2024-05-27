@@ -24,6 +24,22 @@ services:
       - "8083:8083"
     command: ["python", "server.py"]
 
+  server4:
+    build: .
+    environment:
+      - PORT=8084
+    ports:
+      - "8084:8084"
+    command: ["python", "server.py"]
+
+  server5:
+    build: .
+    environment:
+      - PORT=8085
+    ports:
+      - "8085:8085"
+    command: ["python", "server.py"]
+
   monitoring:
     build: .
     environment:
