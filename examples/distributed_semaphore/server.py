@@ -15,7 +15,7 @@ NODE = random.randint(0, 999)
 
 async def handle_acquire(request):
     redis_client = Redis(host='redis')
-    semaphore = DistributedSemaphore(redis_client, 'test_semaphore', 3)
+    semaphore = DistributedSemaphore(redis_client, 'test_semaphore', 5)
 
     start_time = time.perf_counter()
     try:
@@ -43,7 +43,7 @@ async def handle_acquire(request):
 
 async def handle_release(request):
     redis_client = Redis(host='redis')
-    semaphore = DistributedSemaphore(redis_client, 'test_semaphore', 3)
+    semaphore = DistributedSemaphore(redis_client, 'test_semaphore', 5)
 
     start_time = time.perf_counter()
     await semaphore.release()
