@@ -20,22 +20,33 @@ async def fetch_url(session, url):
 
 async def gather_stats(request):
     server_urls = [
-        'http://server1:8081/wait',
         'http://server1:8081/notify',
+        'http://server1:8081/wait',
         'http://server1:8081/notify_all',
-        'http://server2:8082/wait',
         'http://server2:8082/notify',
+        'http://server2:8082/wait',
         'http://server2:8082/notify_all',
-        'http://server3:8083/wait',
         'http://server3:8083/notify',
+        'http://server3:8083/wait',
         'http://server3:8083/notify_all',
+        'http://server4:8084/notify',
+        'http://server4:8084/wait',
+        'http://server4:8084/notify_all',
+        'http://server5:8085/notify',
+        'http://server5:8085/wait',
+        'http://server5:8085/notify_all',
     ]
 
+    num_requests = 100  # Number of requests to send to each server
+
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_url(session, url) for url in server_urls]
+        tasks = []
+        for _ in range(num_requests):
+            for url in server_urls:
+                tasks.append(fetch_url(session, url))
         results = await asyncio.gather(*tasks)
 
-    for result, url in zip(results, server_urls):
+    for result, url in zip(results, server_urls * num_requests):
         start_time, end_time = result
         EXEC_STATS.append(
             {

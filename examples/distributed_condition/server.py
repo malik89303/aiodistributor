@@ -13,12 +13,11 @@ NODE = random.randint(0, 999)
 
 
 async def handle_wait(request):
-    redis_client = Redis(host='redis')
-    condition = DistributedCondition(redis_client, 'test_condition')
+    redis_client = Redis(host='redis', decode_responses=True)
+    condition = DistributedCondition(redis_client, f'test_condition{NODE}')
 
     start_time = time.perf_counter()
-    async with condition._lock:
-        await condition.wait()
+    await condition.wait()
     ended_at = time.perf_counter()
 
     EXEC_STATS.append(
@@ -37,11 +36,11 @@ async def handle_wait(request):
 
 
 async def handle_notify(request):
-    redis_client = Redis(host='redis')
-    condition = DistributedCondition(redis_client, 'test_condition')
+    redis_client = Redis(host='redis', decode_responses=True)
+    condition = DistributedCondition(redis_client, f'test_condition{NODE}')
 
     start_time = time.perf_counter()
-    async with condition._lock:
+    async with condition:
         await condition.notify()
     ended_at = time.perf_counter()
 
@@ -61,11 +60,11 @@ async def handle_notify(request):
 
 
 async def handle_notify_all(request):
-    redis_client = Redis(host='redis')
-    condition = DistributedCondition(redis_client, 'test_condition')
+    redis_client = Redis(host='redis', decode_responses=True)
+    condition = DistributedCondition(redis_client, f'test_condition{NODE}')
 
     start_time = time.perf_counter()
-    async with condition._lock:
+    async with condition:
         await condition.notify_all()
     ended_at = time.perf_counter()
 
