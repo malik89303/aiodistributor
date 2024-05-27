@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import time
@@ -11,10 +12,12 @@ from aiodistributor.distributed_event import DistributedEvent
 EXEC_STATS = []
 NODE = random.randint(0, 999)
 
+distributed_task_logger = logging.getLogger()
+
 
 async def handle_set_event(request):
-    redis_client = Redis(host='redis')
-    event = DistributedEvent(redis_client, 'test_event')
+    redis_client = Redis(host='redis', decode_responses=True)
+    event = DistributedEvent(redis_client, f'test_event{NODE}')
 
     start_time = time.perf_counter()
     await event.set()
@@ -36,8 +39,8 @@ async def handle_set_event(request):
 
 
 async def handle_wait_event(request):
-    redis_client = Redis(host='redis')
-    event = DistributedEvent(redis_client, 'test_event')
+    redis_client = Redis(host='redis', decode_responses=True)
+    event = DistributedEvent(redis_client, f'test_event{NODE}')
 
     start_time = time.perf_counter()
     await event.wait()

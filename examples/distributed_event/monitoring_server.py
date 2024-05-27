@@ -10,8 +10,8 @@ from redis.asyncio import Redis
 EXEC_STATS = []
 
 
-async def fetch_url(session, url):
-    async with session.get(url) as response:
+async def fetch_url(session: aiohttp.ClientSession, url):
+    async with session.get(url, timeout=1) as response:
         start_time = time.perf_counter()
         await response.text()
         end_time = time.perf_counter()
@@ -26,13 +26,22 @@ async def gather_stats(request):
         'http://server2:8082/wait_event',
         'http://server3:8083/set_event',
         'http://server3:8083/wait_event',
+        'http://server4:8084/set_event',
+        'http://server4:8084/wait_event',
+        'http://server5:8085/set_event',
+        'http://server5:8085/wait_event',
     ]
 
+    num_requests = 100  # Number of requests to send to each server
+
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_url(session, url) for url in server_urls]
+        tasks = []
+        for _ in range(num_requests):
+            for url in server_urls:
+                tasks.append(fetch_url(session, url))
         results = await asyncio.gather(*tasks)
 
-    for result, url in zip(results, server_urls):
+    for result, url in zip(results, server_urls * num_requests):
         start_time, end_time = result
         EXEC_STATS.append(
             {
