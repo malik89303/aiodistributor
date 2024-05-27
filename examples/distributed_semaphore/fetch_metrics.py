@@ -34,6 +34,7 @@ def calculate_statistics(times):
 def plot_metrics(metrics):
     server_urls = list(set(entry['server'] for entry in metrics))
     stats_summary = []
+    plt.figure(figsize=(14, 8))
 
     for i, server_url in enumerate(server_urls):
         server_metrics = [entry for entry in metrics if entry['server'] == server_url]
@@ -51,7 +52,8 @@ def plot_metrics(metrics):
     plt.xlabel('Request Index')
     plt.ylabel('Response Time (s)')
     plt.title('Server Response Times')
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout(rect=[0, 0, 0.9, 1])
     plt.savefig('server_response_times.png')
     plt.show()
 

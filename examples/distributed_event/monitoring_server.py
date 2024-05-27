@@ -32,7 +32,7 @@ async def gather_stats(request):
         'http://server5:8085/wait_event',
     ]
 
-    num_requests = 100  # Number of requests to send to each server
+    num_requests = 200  # Number of requests to send to each server
 
     async with aiohttp.ClientSession() as session:
         tasks = []

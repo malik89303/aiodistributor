@@ -37,11 +37,16 @@ async def gather_stats(request):
         'http://server5:8085/abort',
     ]
 
+    num_requests = 100  # Number of each type of request to send to each server
+
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_url(session, url) for url in server_urls]
+        tasks = []
+        for _ in range(num_requests):
+            for url in server_urls:
+                tasks.append(fetch_url(session, url))
         results = await asyncio.gather(*tasks)
 
-    for result, url in zip(results, server_urls):
+    for result, url in zip(results, server_urls * num_requests):
         start_time, end_time = result
         EXEC_STATS.append(
             {

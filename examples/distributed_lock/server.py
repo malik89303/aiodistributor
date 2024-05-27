@@ -15,7 +15,7 @@ NODE = random.randint(0, 999)
 
 async def handle(_: web.Request) -> web.Response:
     redis_client = Redis(host='host.docker.internal')
-    lock = DistributedLock(redis_client, 'test_lock')
+    lock = DistributedLock(redis_client, f'test_lock{NODE}')
 
     start_time = time.perf_counter()
     async with lock:
