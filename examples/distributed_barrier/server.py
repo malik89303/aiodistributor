@@ -6,15 +6,15 @@ import ujson
 from aiohttp import web
 from redis.asyncio import Redis
 
-from aiodistributor.distibuted_barrier import BrokenBarrierError, DistributedBarrier
+from aiodistributor.distributed_barrier import BrokenBarrierError, DistributedBarrier
 
 EXEC_STATS = []
 NODE = random.randint(0, 999)
 
 
 async def handle_wait(request):
-    redis_client = Redis(host='redis')
-    barrier = DistributedBarrier(redis_client, 'test_barrier', 3)
+    redis_client = Redis(host='redis', decode_responses=True)
+    barrier = DistributedBarrier(redis_client, 'test_barrier', 5)
 
     start_time = time.perf_counter()
     try:
@@ -41,8 +41,8 @@ async def handle_wait(request):
 
 
 async def handle_reset(request):
-    redis_client = Redis(host='redis')
-    barrier = DistributedBarrier(redis_client, 'test_barrier', 3)
+    redis_client = Redis(host='redis', decode_responses=True)
+    barrier = DistributedBarrier(redis_client, 'test_barrier', 5)
 
     start_time = time.perf_counter()
     await barrier.reset()
@@ -64,8 +64,8 @@ async def handle_reset(request):
 
 
 async def handle_abort(request):
-    redis_client = Redis(host='redis')
-    barrier = DistributedBarrier(redis_client, 'test_barrier', 3)
+    redis_client = Redis(host='redis', decode_responses=True)
+    barrier = DistributedBarrier(redis_client, 'test_barrier', 5)
 
     start_time = time.perf_counter()
     await barrier.abort()

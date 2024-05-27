@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from aiodistributor.distibuted_barrier import BrokenBarrierError, DistributedBarrier
+from aiodistributor.distributed_barrier import BrokenBarrierError, DistributedBarrier
 
 
 async def test_barrier_wait_success(isolate_redis):

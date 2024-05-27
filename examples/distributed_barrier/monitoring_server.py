@@ -29,6 +29,12 @@ async def gather_stats(request):
         'http://server3:8083/wait',
         'http://server3:8083/reset',
         'http://server3:8083/abort',
+        'http://server4:8084/wait',
+        'http://server4:8084/reset',
+        'http://server4:8084/abort',
+        'http://server5:8085/wait',
+        'http://server5:8085/reset',
+        'http://server5:8085/abort',
     ]
 
     async with aiohttp.ClientSession() as session:
