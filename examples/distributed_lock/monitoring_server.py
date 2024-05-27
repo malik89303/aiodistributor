@@ -26,7 +26,7 @@ async def gather_stats(request: web.Request) -> web.Response:
         'http://server5:8085/',
     ]
 
-    num_requests = 100  # Number of requests to send to each server
+    num_requests = 1000  # Number of requests to send to each server
 
     async with ClientSession() as session:
         tasks = []

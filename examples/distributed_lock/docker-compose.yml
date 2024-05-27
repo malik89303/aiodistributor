@@ -30,7 +30,7 @@ services:
       - PORT=8084
     ports:
       - "8084:8084"
-    command: ["python", "server.py"]
+    command: [ "python", "server.py" ]
 
   server5:
     build: .
@@ -38,7 +38,7 @@ services:
       - PORT=8085
     ports:
       - "8085:8085"
-    command: ["python", "server.py"]
+    command: [ "python", "server.py" ]
 
   monitoring:
     build: .
